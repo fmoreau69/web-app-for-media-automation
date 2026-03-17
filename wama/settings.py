@@ -140,6 +140,10 @@ MEDIA_OUTPUT_ROOT = MEDIA_ROOT / 'anonymizer' / 'output'
 SECRET_KEY = 'i%06y2q&4l-!nv*8oolv470b!o)!xg*^9f7^d=q10#b$wd%c_e'
 ALLOWED_HOSTS = ['*']
 
+# Allow same-origin framing (needed for PDF embed preview in Chrome)
+# DENY (Django default) blocks even same-origin iframes/embed used by Chrome's PDF viewer
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 # Nom d'hôte machine
 try:
     HOSTNAME = socket.gethostname()
