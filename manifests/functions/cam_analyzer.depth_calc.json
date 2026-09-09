@@ -6,8 +6,18 @@
     "cost": {
       "cpu_bound": true
     },
-    "impl": "cam_analyzer.utils.depth_estimator:depth_distance_report",
+    "impl": "cam_analyzer.tasks:compute_depth_calc_task",
     "inputs": [
+      {
+        "cardinality": "one",
+        "data_type": "depth_map",
+        "description": "Cartes stockées (DepthFrame).",
+        "group": "travail",
+        "key": "depth",
+        "optional": false,
+        "produced_fields": [],
+        "required_fields": []
+      },
       {
         "cardinality": "one",
         "data_type": "detections",
@@ -18,13 +28,25 @@
         "produced_fields": [],
         "required_fields": [
           "bbox",
-          "distance_m",
           "depth_distance_m"
         ]
       }
     ],
-    "key": "cam_analyzer.depth_distance_report",
+    "key": "cam_analyzer.depth_calc",
     "outputs": [
+      {
+        "cardinality": "one",
+        "data_type": "scalar",
+        "description": "",
+        "key": "ground_calib",
+        "optional": false,
+        "produced_fields": [
+          "pitch_deg",
+          "height_m",
+          "source"
+        ],
+        "required_fields": []
+      },
       {
         "cardinality": "one",
         "data_type": "scalar",
@@ -47,15 +69,14 @@
       "vision",
       "geo",
       "depth",
-      "monocular",
-      "ab-metric"
+      "monocular"
     ],
     "visibility": "public"
   },
-  "description": "ÉTAGE 2 (CALCUL, CPU) : LECTURE PURE des depth_distance_m déjà stockés par depth_analysis. MESURE-ET-RAPPORT (ne bascule AUCUNE source) : 3ᵉ source de distance indépendante (désaccord ↔pinhole / ↔homographie = usage 3 ; confirmation des reflets = usage 1). Chaque usage écrit sa ligne A/B console ; résumé dans results_summary['depth_report']. AUCUNE ré-inférence GPU.",
-  "key": "cam_analyzer.depth_distance_report",
+  "description": "La PASSE `depth_calc` du volet (session-wide, CPU) : relit les DepthFrame stockées et enchaîne les deux calculs catalogués à part — `depth_ground_plane` (plan de sol, store_ground_calib source='depth') puis `depth_distance_report` (cross-check). Déclarée comme passe pour que le pipeline soit exportable nœud par nœud (D13).",
+  "key": "cam_analyzer.depth_calc",
   "manifest_kind": "function",
-  "name": "Cross-check distance & reflets par profondeur (usages 3+1)",
+  "name": "Calculs profondeur (passe)",
   "owner": null,
   "projects": [
     "ENA"
@@ -64,7 +85,7 @@
   "scope_org_unit": null,
   "scope_project": null,
   "source": {
-    "ref": "FUNCTION_CATALOG:cam_analyzer.depth_distance_report",
+    "ref": "FUNCTION_CATALOG:cam_analyzer.depth_calc",
     "type": "extract"
   },
   "visibility": "public",
